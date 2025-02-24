@@ -20,27 +20,40 @@ func main() {
 			maxIdleConns: env.GetInt("DB_MAX_IDLE_CONNS", 30),
 			maxIdleTime:  env.GetString("DB_MAX_IDLE_TIME", "15m"),
 		},
+		qdb: qdrantDbConfig{
+			host: "localhost",
+			port: 6334,
+		},
 		env: env.GetString("ENV", "development"),
 	}
 
-	db, err := db.New(
+
+	
+	sqldb, err := db.New(
 		cfg.db.addr,
 		cfg.db.maxOpenConns,
 		cfg.db.maxIdleConns,
 		cfg.db.maxIdleTime,
 	)
-
 	if err != nil {
 		log.Panic(err)
 	}
-
-	defer db.Close()
-
+	defer sqldb.Close()
 	log.Println("database connection pool is established")
+
+
+	quadrantDb,err := db.NewQdrantDB(cfg.qdb.host,cfg.qdb.port);
+	if err!=nil{
+		log.Panic(err)
+	}
+	defer quadrantDb.Close()
+	log.Println("connected to Qdrant DB sucessfully")
+
 
 	app := &application{
 		config: cfg,
-		store:  store.NewStorage(db),
+		store:  store.NewStorage(sqldb),
+		qdrantstore: store.NewQdrantStorage(quadrantDb),
 	}
 
 	mux := app.mount()

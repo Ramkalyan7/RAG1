@@ -1,4 +1,30 @@
+version: '3.9'
+
 services:
+  # 🟢 Qdrant Vector Database
+  qdrant:
+    image: qdrant/qdrant:latest
+    restart: always
+    container_name: qdrant
+    ports:
+      - 6333:6333       # REST API
+      - 6334:6334       # gRPC API
+    expose:
+      - 6333
+      - 6334
+      - 6335
+    configs:
+      - source: qdrant_config
+        target: /qdrant/config/production.yaml
+    volumes:
+      - ./qdrant_data:/qdrant/storage
+    depends_on:
+      - db               # Ensure db starts first
+    environment:
+      # Optional: If Qdrant needs to connect to Postgres
+      POSTGRES_URL: "postgres://admin:adminpassword@db:5432/rag1"
+
+  # 🟣 PostgreSQL Database
   db:
     image: postgres:16.3
     container_name: postgres-db-rag
@@ -11,5 +37,12 @@ services:
     ports:
       - "5432:5432"
 
+# 📂 Volumes for Persistent Storage
 volumes:
   db-data:
+
+# ⚙️ Configurations for Qdrant
+configs:
+  qdrant_config:
+    content: |
+      log_level: INFO

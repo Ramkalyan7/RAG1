@@ -13,11 +13,13 @@ import (
 type application struct {
 	config serverConfig
 	store store.Storage
+	qdrantstore store.QdrantStorage
 }
 
 type serverConfig struct{
 	addr string
 	db dbconfig
+	qdb qdrantDbConfig
 	env string
 }
 
@@ -26,6 +28,11 @@ type dbconfig struct{
 	maxOpenConns int
 	maxIdleConns int
 	maxIdleTime string
+}
+
+type qdrantDbConfig struct{
+	host string
+	port int64
 }
 
 func (app *application) mount()http.Handler{
