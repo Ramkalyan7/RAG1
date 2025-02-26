@@ -1,19 +1,17 @@
-package main
+package dataparser
 
 import (
 	"bytes"
-	"fmt"
-
 	"github.com/dslipak/pdf"
 )
 
 
-func main() {
+func ReadPdfFile()(string,error){
 	content, err := readPdf("cmd/sourcedata/RK.pdf") // Read local pdf file
 	if err != nil {
-		panic(err)
+		return "",err
 	}
-	fmt.Println(content)
+	return content,nil;
 }
 
 func readPdf(path string) (string, error) {
