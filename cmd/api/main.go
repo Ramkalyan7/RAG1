@@ -21,8 +21,8 @@ func main() {
 			maxIdleTime:  env.GetString("DB_MAX_IDLE_TIME", "15m"),
 		},
 		qdb: qdrantDbConfig{
-			host: "localhost",
-			port: 6334,
+			host: env.GetString("QDRANT_HOST","localhost"),
+			port: env.GetInt("QDRANT_PORT", 6334),
 		},
 		env: env.GetString("ENV", "development"),
 	}
@@ -52,8 +52,7 @@ func main() {
 
 	app := &application{
 		config: cfg,
-		store:  store.NewStorage(sqldb),
-		qdrantstore: store.NewQdrantStorage(quadrantDb),
+		store:  store.NewStorage(sqldb,quadrantDb),
 	}
 
 	mux := app.mount()
